@@ -16,6 +16,18 @@ class BlogController extends AbstractController
      */
     public function index(): Response
     {
-            return $this->render('blog/index.html.twig', []);
+        return $this->render('blog/index.html.twig', [ 'f'=>'f']);
+    }
+    public function login()
+    {
+        return $this->render('blog/login.html.twig', []);
+    }
+    public function list()
+    {
+        return $this->render('/blog/list.html.twig', []);
+    }
+    public function about()
+    {
+        return $this->render('/blog/about.html.twig', []);
     }
 }
