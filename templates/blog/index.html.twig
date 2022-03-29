@@ -1,17 +1,22 @@
 <html>
 <head>
-    <title>
-        Blog Title
-    </title>
+    {% block tittle %}
+    <title>Blog Title</title>
+    {% endblock %}
 </head>
-
 <body>
-
+{% block body %}
 <div>
-    <a href="/" title="Lista">HomePage</a>
-    <a href="templates/blog/list.html.twig" title="Lista">Article list</a>
-    <a href="templates/blog/login.html.twig" title="Lista">Login</a>
-    <a href="templates/blog/about.html.twig" title="Lista">About me</a>
+    {% block links %}
+    <a href="{{ url('index')}}" title="Home">Homepage</a>
+    <a href="{{ url('list')}}" title="List">Article List</a>
+    <a href="{{ url('login')}}" title="Login">Login</a>
+    <a href="{{ url('contact')}}" title="Contact">Contact</a>
+    {% endblock %}
 </div>
+{% block content %}
+
+{% endblock %}
+{% endblock %}
 </body>
 </html>

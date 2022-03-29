@@ -1,33 +1,104 @@
 <?php
-// src/Controller/LuckyController.php
 namespace App\Controller;
-
+use App\Form\BlogPostFormType;
+use Symfony\Component\Form\FormTypeInterface;
+use App\Entity\BlogCategory;
+use App\Entity\BlogPost;
+use App\Repository\BlogCategoryRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\CategoryformType;
 
-class BlogController extends AbstractController
+class BlogController extends  AbstractController
 {
-    /**
-     * @Route("/")
-     *
-     * @return Response
-     * @throws \Exception
-     */
+
+    public function view(ManagerRegistry $doctrine,int $id): Response
+    {
+        if($id != 0 ) {
+            $category = $doctrine->getRepository(BlogCategory::class)->find($id);
+            $posts = $category->getPost();
+        }
+        else{
+            $posts = $doctrine->getRepository(BlogPost::class)->findAll();
+        }
+        return $this->render('blog/view.html.twig',[
+            "posts"=>$posts,
+        ]);
+    }
+    public function showpost(ManagerRegistry $doctrine,int $id): Response
+    {
+        $post= $doctrine->getRepository(BlogPost::class)->find($id);
+        return $this->render('blog/showpost.html.twig',[
+            "post"=>$post,
+        ]);
+    }
     public function index(): Response
     {
-        return $this->render('blog/index.html.twig', [ 'f'=>'f']);
+        $name = "Homepage";
+        return $this->render('blog/index.html.twig',[
+            "name"=>$name,
+        ]);
     }
-    public function login()
+
+    public function list(ManagerRegistry $doctrine): Response
     {
-        return $this->render('blog/login.html.twig', []);
+        $repository = $doctrine->getRepository(BlogCategory::class);
+        $blogCategories = $repository->findAll();
+
+        return $this->render('blog/list.html.twig',[
+            "blogCategories"=>$blogCategories,
+        ]);
     }
-    public function list()
+    public function newcat(Request $request,ManagerRegistry $doctrine)
     {
-        return $this->render('/blog/list.html.twig', []);
+        $category = new BlogCategory();
+
+        $form = $this->createForm(CategoryformType::class, $category);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted()&&$form->isValid())
+        {
+            $em = $doctrine->getManager();
+            $em->persist($category);
+            $em->flush();
+        }
+
+        return $this->render('blog/newcat.html.twig',[
+            'form'=>$form->createView(),
+        ]);
     }
-    public function about()
+    public function newpost(Request $request,ManagerRegistry $doctrine): Response
     {
-        return $this->render('/blog/about.html.twig', []);
+    $post = new BlogPost();
+
+        $form = $this->createForm(BlogPostFormType::class, $post);
+        $form->handleRequest($request);
+        if($form->isSubmitted()&&$form->isValid())
+        {
+            $em = $doctrine->getManager();
+            $em->persist($post);
+            $em->flush();
+        }
+    return $this->render('blog/newpost.html.twig',[
+        'form'=>$form->createView(),
+    ]);
+}
+
+    public function login(): Response
+    {
+        $name = "Login";
+        return $this->render('blog/login.html.twig',[
+            "name"=>$name,
+        ]);
     }
+    public function contact(): Response
+    {
+        $name = "Contact";
+        return $this->render('blog/contact.html.twig',[
+            "name"=>$name,
+        ]);
+    }
+
 }
